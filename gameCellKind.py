@@ -34,3 +34,10 @@ class GameCellKind(Enum):
     SNAKE_RIGHT_TO_TOP_CORNER = 16
     SNAKE_LEFT_TO_BOTTOM_CORNER = 17
     SNAKE_RIGHT_TO_BOTTOM_CORNER = 18
+
+
+CANDY_SET = {
+    GameCellKind.BLUE_CANDY,
+    GameCellKind.RED_CANDY,
+    GameCellKind.YELLOW_CANDY
+}
