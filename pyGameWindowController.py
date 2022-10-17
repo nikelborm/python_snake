@@ -5,18 +5,18 @@ from customExceptions import WillingExitException, \
 from direction import Direction
 from position import Position
 import pygame
-from pygame import surface, color
+from pygame import surface, color, rect
 from constant import CELL_SIZE_IN_PIXELS, DIFFICULTY, WINDOW_SIZE_Y, \
     GAME_FIELD_BACKGROUND_COLOR, GAME_OVER_TEXT_COLOR, USE_PREDEFINED_STEPS, \
-    WINDOW_SIZE_X, GAME_OVER_BACKGROUND_COLOR, changeblePredefinedSteps
+    WINDOW_SIZE_X, GAME_OVER_BACKGROUND_COLOR, changeablePredefinedSteps
 
 
 class PyGameWindowController:
     def __init__(self):
         self.__initPyGame()
 
-    def updadeScreen(self, *positionsOfScreenToUpdate: Position):
-        pygame.display.update()
+    def updadeScreen(self, *rectsToRerender: rect.Rect):
+        pygame.display.update(list(rectsToRerender))
         self.__gameClock.tick(DIFFICULTY)
 
     def drawAsset(self, sourceAsset: surface.Surface, position: Position):
@@ -51,9 +51,9 @@ class PyGameWindowController:
         direction: Optional[Direction] = None
 
         if USE_PREDEFINED_STEPS:
-            if not changeblePredefinedSteps:
+            if not changeablePredefinedSteps:
                 raise NoPredefinedStepsLeftException()
-            return changeblePredefinedSteps.pop(0)
+            return changeablePredefinedSteps.pop(0)
 
         for event in pygame.event.get():
             match [event.key if event.type == pygame.KEYDOWN else event.type]:
@@ -98,6 +98,7 @@ class PyGameWindowController:
         )
         self.__gameClock = pygame.time.Clock()
         self.__gameWindow.fill(GAME_FIELD_BACKGROUND_COLOR)
+        pygame.display.update()
 
     def __getCellRectFrom(self, position: Position):
         return {
