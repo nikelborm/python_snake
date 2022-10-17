@@ -11,11 +11,16 @@ class CandyMap:
         self.__cachedCandyMap = PositionToHolderMap()
 
     def reduceAllCandiesSizeByOne(self):
+        removedCandyPositions: List[Position] = []
+
         for candy in self.getAllCandies():
-            candy.size = candy.size
+            candy.size -= 1
 
             if candy.size == 0:
                 self.__cachedCandyMap.remove(candy)
+                removedCandyPositions.append(candy.position)
+
+        return removedCandyPositions
 
     def createNewCandy(
         self,

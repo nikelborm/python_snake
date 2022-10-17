@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import List, Optional
 from candy import Candy
 from candyColor import CandyColor
 from customExceptions import BrokenGameLogicException, GameOverException
@@ -8,6 +8,7 @@ from getAssetForCell import getAssetForCell, getColorForCell
 from position import Position
 from pyGameWindowController import PyGameWindowController
 from snake import Snake
+from pygame import rect
 from candyMap import CandyMap
 from constant import CELL_RENDERER, GAME_GRID_Y_SIZE_IN_GAME_CELLS, \
     GAME_GRID_X_SIZE_IN_GAME_CELLS
@@ -20,13 +21,13 @@ class GameEngine:
 
     def runGameLoop(self):
         while True:
-            self.__makeGameIteration(
+            rectsToRerender = self.__makeGameIteration(
                 self.__getNextHeadDirection(
                     self.__windowController.parsePyGameEvents()
                 )
             )
 
-            self.__windowController.updadeScreen()
+            self.__windowController.updadeScreen(*rectsToRerender)
 
     def __makeGameIteration(self, direction: Direction):
         if self.__snake.willSnakeBiteItselfAfterMove(direction):
@@ -46,14 +47,20 @@ class GameEngine:
         )
 
         # every snake iteration we rerender only about 4 cells
-        for position in cellsPositions:
-            self.__renderCell(position)
+        rectsToRerender: List[rect.Rect] = [
+            self.__renderCell(position) for position in cellsPositions
+        ]
 
         if doesHeadFacesCandy:
             self.__playerScore += candy.size
             self.__candiesField.removeCandyBy(candy.position)
 
-        self.__candiesField.reduceAllCandiesSizeByOne()
+        rectsToRerender.extend(
+            self.__renderCell(position)
+            for position in self.__candiesField.reduceAllCandiesSizeByOne()
+        )
+
+        return rectsToRerender
 
     def __getNextHeadDirection(
         self,
@@ -125,22 +132,28 @@ class GameEngine:
     def __setInitialGameState(self):
         self.__snake = Snake()
         self.__candiesField = CandyMap()
-        candy = self.__candiesField.createNewCandy(
-            Position(3, 4),
-            CandyColor.BLUE,
-            7
-        )
-        self.__renderCell(candy.position)
-        candy = self.__candiesField.createNewCandy(
-            Position(5, 7),
-            CandyColor.RED,
-            7
-        )
-        self.__renderCell(candy.position)
-        candy = self.__candiesField.createNewCandy(
-            Position(2, 9),
-            CandyColor.YELLOW,
-            7
-        )
-        self.__renderCell(candy.position)
+        self.__setInitialCandies()
         self.__playerScore: int = 0
+
+    def __setInitialCandies(self):
+        candies = [
+            self.__candiesField.createNewCandy(
+                Position(3, 4),
+                CandyColor.BLUE,
+                5
+            ),
+            self.__candiesField.createNewCandy(
+                Position(5, 7),
+                CandyColor.RED,
+                9
+            ),
+            self.__candiesField.createNewCandy(
+                Position(2, 9),
+                CandyColor.YELLOW,
+                15
+            )
+        ]
+        rectsToRerender = [
+            self.__renderCell(candy.position) for candy in candies
+        ]
+        self.__windowController.updadeScreen(*rectsToRerender)
