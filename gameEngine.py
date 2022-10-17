@@ -80,22 +80,20 @@ class GameEngine:
         overridedCellKind: Optional[GameCellKind] = None,
         cellRenderer: str = CELL_RENDERER
     ):
-        cellKind: GameCellKind = (
+        cellKind: GameCellKind = self.__getCellKindBy(
+            position,
             overridedCellKind
-            or self.__snake.getGameCellKindBy(position)
-            or self.__candiesField.getGameCellKindBy(position)
-            or GameCellKind.VOID
         )
-
-        if cellRenderer == 'asset':
-            return self.__windowController.drawAsset(
-                getAssetForCell(cellKind),
-                position
-            )
 
         if cellRenderer == 'color':
             return self.__windowController.drawColor(
                 getColorForCell(cellKind),
+                position
+            )
+
+        if cellRenderer == 'asset':
+            return self.__windowController.drawAsset(
+                getAssetForCell(cellKind),
                 position
             )
 
@@ -110,6 +108,18 @@ class GameEngine:
             or position.y <= 0
             or position.x >= GAME_GRID_X_SIZE_IN_GAME_CELLS
             or position.y > GAME_GRID_Y_SIZE_IN_GAME_CELLS
+        )
+
+    def __getCellKindBy(
+        self,
+        position: Position,
+        overridedCellKind: Optional[GameCellKind] = None,
+    ):
+        return (
+            overridedCellKind
+            or self.__snake.getGameCellKindBy(position)
+            or self.__candiesField.getGameCellKindBy(position)
+            or GameCellKind.VOID
         )
 
     def __setInitialGameState(self):
