@@ -5,5 +5,5 @@ from positionHolder import _PositionHolder
 
 @dataclass
 class Candy(_PositionHolder):
-  color: CandyColor
-  size: int
+    color: CandyColor
+    size: int

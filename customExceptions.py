@@ -1,8 +1,10 @@
 class GameOverException(Exception):
-  pass
+    pass
+
 
 class WillingExitException(Exception):
-  pass
+    pass
+
 
 class BrokenGameLogicException(Exception):
-  pass
+    pass
