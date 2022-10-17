@@ -1,12 +1,13 @@
 import sys
-from typing import Optional
+from typing import Optional, Tuple
 from customExceptions import WillingExitException, \
     NoPredefinedStepsLeftException
 from direction import Direction
 from position import Position
 import pygame
 from pygame import surface, color, rect
-from constant import CELL_SIZE_IN_PIXELS, DIFFICULTY, WINDOW_SIZE_Y, \
+from constant import CELL_SIZE_IN_PIXELS, DIFFICULTY, GREEN, WHITE, \
+    WINDOW_SIZE_Y, \
     GAME_FIELD_BACKGROUND_COLOR, GAME_OVER_TEXT_COLOR, USE_PREDEFINED_STEPS, \
     WINDOW_SIZE_X, GAME_OVER_BACKGROUND_COLOR, changeablePredefinedSteps
 
@@ -30,22 +31,70 @@ class PyGameWindowController:
             tuple(self.__getCellRectFrom(position).values())
         )
 
-    def renderGameOverScreen(self, score):
-        my_font = pygame.font.SysFont('times new roman', 90)
-        game_over_surface = my_font.render(
-            'GAME OVER',
-            True,
-            GAME_OVER_TEXT_COLOR
+    def drawWhiteTextOnCell(self, text: str, position: Position):
+        my_font = pygame.font.SysFont('verdana', 24)
+        game_over_surface = my_font.render(text, True, WHITE)
+        game_over_rect = game_over_surface.get_rect(
+            **self.__getCellRectFrom(position)
         )
-        game_over_rect = game_over_surface.get_rect()
-        game_over_rect.midtop = (
-            int(WINDOW_SIZE_X / 2),
-            int(WINDOW_SIZE_Y / 4)
-        )
+        # game_over_rect.midtop = (
+        #     int(WINDOW_SIZE_X / 2),
+        #     int(WINDOW_SIZE_Y / 4)
+        # )
+        return self.__gameWindow.blit(game_over_surface, game_over_rect)
+
+    def renderGameOverScreen(
+        self,
+        deathReason: str,
+        playerScore: int,
+        snakeLength: int
+    ):
         self.__gameWindow.fill(GAME_OVER_BACKGROUND_COLOR)
-        self.__gameWindow.blit(game_over_surface, game_over_rect)
-        self.renderScore(score, 0, GAME_OVER_TEXT_COLOR, 'times', 20)
-        pygame.display.flip()
+        self.renderCenteredText(
+            'GAME OVER',
+            GAME_OVER_TEXT_COLOR,
+            'times new roman',
+            90,
+            (
+                int(WINDOW_SIZE_X / 2),
+                int(WINDOW_SIZE_Y / 4)
+            )
+        )
+        self.renderCenteredText(
+            f'Score: {playerScore}',
+            WHITE,
+            'times new roman',
+            26,
+            (
+                int(WINDOW_SIZE_X / 2),
+                int(WINDOW_SIZE_Y / 1.25)
+            )
+        )
+        self.renderCenteredText(
+            f'Snake lengh: {snakeLength}',
+            GREEN,
+            'times new roman',
+            26,
+            (
+                int(WINDOW_SIZE_X / 2),
+                int(WINDOW_SIZE_Y / 1.35)
+            )
+        )
+        self.renderCenteredText(
+            deathReason,
+            GAME_OVER_TEXT_COLOR,
+            'verdana',
+            30,
+            (
+                int(WINDOW_SIZE_X / 2),
+                int(WINDOW_SIZE_Y / 1.65)
+            )
+        )
+        pygame.display.update()
+
+    def clearWindow(self):
+        self.__gameWindow.fill(GAME_FIELD_BACKGROUND_COLOR)
+        pygame.display.update()
 
     def parsePyGameEvents(self) -> Optional[Direction]:
         direction: Optional[Direction] = None
@@ -65,21 +114,27 @@ class PyGameWindowController:
                 case [pygame.K_DOWN]:  direction = Direction.BOTTOM
         return direction
 
-    def renderScore(self, score, choice, color, font, size):
-        score_font = pygame.font.SysFont(font, size)
-        score_surface = score_font.render(
-            f'Score : {score}',
-            True,
-            color
+    def renderScoreIntoGameWindow(self, score: int):
+        self.renderCenteredText(
+            f'Score: {score}',
+            GAME_OVER_TEXT_COLOR,
+            'times new roman',
+            20,
+            (int(WINDOW_SIZE_X / 10), 15)
         )
+
+    def renderCenteredText(
+        self,
+        text:  str,
+        color: color.Color,
+        font: str,
+        fontSize: int,
+        midtop: Tuple[int, int]
+    ):
+        score_font = pygame.font.SysFont(font, fontSize)
+        score_surface = score_font.render(text, True, color)
         score_rect = score_surface.get_rect()
-        if choice == 1:
-            score_rect.midtop = (int(WINDOW_SIZE_X / 10), 15)
-        else:
-            score_rect.midtop = (
-                int(WINDOW_SIZE_X / 2),
-                int(WINDOW_SIZE_Y / 1.25)
-            )
+        score_rect.midtop = midtop
         self.__gameWindow.blit(score_surface, score_rect)
 
     def __initPyGame(self):
@@ -97,14 +152,13 @@ class PyGameWindowController:
             (WINDOW_SIZE_X, WINDOW_SIZE_Y)
         )
         self.__gameClock = pygame.time.Clock()
-        self.__gameWindow.fill(GAME_FIELD_BACKGROUND_COLOR)
-        pygame.display.update()
+        self.clearWindow()
 
     def __getCellRectFrom(self, position: Position):
         return {
             'x': position.x * CELL_SIZE_IN_PIXELS,
             # needed because pygame has coordinates system with reversed Y
-            'y': WINDOW_SIZE_Y - position.y * CELL_SIZE_IN_PIXELS,
+            'y': WINDOW_SIZE_Y - (position.y + 1) * CELL_SIZE_IN_PIXELS,
             'width': CELL_SIZE_IN_PIXELS,
             'height': CELL_SIZE_IN_PIXELS
         }
