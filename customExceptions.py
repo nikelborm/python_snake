@@ -8,3 +8,7 @@ class WillingExitException(Exception):
 
 class BrokenGameLogicException(Exception):
     pass
+
+
+class NoPredefinedStepsLeftException(Exception):
+    pass

@@ -5,22 +5,20 @@ from positionHolder import _PositionHolder
 
 class PositionToHolderMap:
     def __init__(self):
-        self.__store: Dict[str, _PositionHolder] = {}
+        self.store: Dict[int, _PositionHolder] = {}
 
-    def add(self, holder: _PositionHolder):
-        self.__store[self.__getHashOf(holder.position)] = holder
+    def add(self, *holders: _PositionHolder):
+        for holder in holders:
+            self.store[hash(holder.position)] = holder
 
     def getBy(self, position: Position) -> Optional[_PositionHolder]:
-        return self.__store.get(self.__getHashOf(position))
+        return self.store.get(hash(position))
 
     def remove(self, holder: _PositionHolder):
         self.removeBy(holder.position)
 
     def removeBy(self, position: Position):
-        del self.__store[self.__getHashOf(position)]
+        del self.store[hash(position)]
 
     def getAll(self):
-        return self.__store.values()
-
-    def __getHashOf(self, position: Position):
-        return f'{position.x}_{position.y}'
+        return list(self.store.values())

@@ -4,12 +4,12 @@ from direction import Direction
 from directionToPositionChangers import directionToPositionChangers
 
 
-@dataclass(order=True)
+@dataclass(order=True, unsafe_hash=True)
 class Position:
     x: int
     y: int
 
-    def getNewPositionBy(self, direction: Direction) -> Self:
+    def getNewPositionShiftedInto(self, direction: Direction) -> Self:
         changeX, changeY = directionToPositionChangers[direction]
 
         return Position(
