@@ -17,17 +17,18 @@ from customExceptions import GameOverException, WillingExitException,\
 
 if __name__ == "__main__":
     game = GameEngine()
-    try:
-        game.runGameLoop()
-        # pass
-    except (
-        GameOverException, WillingExitException, KeyboardInterrupt
-    ) as error:
-        print(error)
-        pygame.quit()
-        sys.exit()
-    except NoPredefinedStepsLeftException as error:
-        print(error)
-        sleep(10)
-        pygame.quit()
-        sys.exit()
+    while True:
+        try:
+            game.runGameLoop()
+            # pass
+        except (
+            GameOverException, WillingExitException, KeyboardInterrupt
+        ) as error:
+            print(error)
+            pygame.quit()
+            sys.exit()
+        except NoPredefinedStepsLeftException as error:
+            print(error)
+            sleep(10)
+            pygame.quit()
+            sys.exit()
