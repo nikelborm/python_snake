@@ -3,15 +3,16 @@ from typing_extensions import Self
 from direction import Direction
 from directionToPositionChangers import directionToPositionChangers
 
+
 @dataclass(order=True)
 class Position:
-  x: int
-  y: int
+    x: int
+    y: int
 
-  def getNewPositionBy(self, direction: Direction) -> Self:
-    changeX, changeY = directionToPositionChangers[direction]
+    def getNewPositionBy(self, direction: Direction) -> Self:
+        changeX, changeY = directionToPositionChangers[direction]
 
-    return Position(
-      x=changeX(self.x),
-      y=changeY(self.y)
-    )
+        return Position(
+            x=changeX(self.x),
+            y=changeY(self.y)
+        )

@@ -1,12 +1,12 @@
 import pygame
 # Difficulty settings
-# Easy      ->  10
-# Medium    ->  25
-# Hard      ->  40
-# Harder    ->  60
-# Impossible->  120
+# Easy       ->    10
+# Medium     ->    25
+# Hard       ->    40
+# Harder     ->    60
+# Impossible ->    120
 DIFFICULTY = 1
-# Window size
+
 WINDOW_SIZE_X = 720
 WINDOW_SIZE_Y = 480
 

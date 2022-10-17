@@ -8,49 +8,65 @@ from direction import Direction
 
 @dataclass
 class SnakeNode(_PositionHolder):
-  nextnode: Optional[Self] = None
+    nextnode: Optional[Self] = None
 
-  def getShiftedNode(self, direction: Direction, nextnode: Optional[Self] = None) -> Self:
-    return SnakeNode(
-      self.position.getNewPositionBy(direction),
-      nextnode,
-    )
+    def getShiftedNode(
+        self,
+        direction: Direction,
+        nextnode: Optional[Self] = None
+    ) -> Self:
+        return SnakeNode(
+            self.position.getNewPositionBy(direction),
+            nextnode,
+        )
 
-  @property
-  def selfToNextNodeDirection(self):
-    return self.__calcDirection(
-      Direction.BOTTOM,
-      Direction.TOP,
-      Direction.LEFT,
-      Direction.RIGHT,
-    )
+    @property
+    def selfToNextNodeDirection(self):
+        return self.__calcDirection(
+            Direction.BOTTOM,
+            Direction.TOP,
+            Direction.LEFT,
+            Direction.RIGHT,
+        )
 
-  @property
-  def nextNodeToSelfDirection(self):
-    return self.__calcDirection(
-      Direction.TOP,
-      Direction.BOTTOM,
-      Direction.RIGHT,
-      Direction.LEFT,
-    )
+    @property
+    def nextNodeToSelfDirection(self):
+        return self.__calcDirection(
+            Direction.TOP,
+            Direction.BOTTOM,
+            Direction.RIGHT,
+            Direction.LEFT,
+        )
 
-  def __calcDirection(self,
-    whenSelfYBigger: Direction,
-    whenSelfYSmaller: Direction,
-    whenSelfXBigger: Direction,
-    whenSelfXLower: Direction
-  ) -> Direction:
-    if self.nextnode is None:
-      raise BrokenGameLogicException('Cannot get directionOfNextNode for node without next node')
+    def __calcDirection(
+        self,
+        whenSelfYBigger: Direction,
+        whenSelfYSmaller: Direction,
+        whenSelfXBigger: Direction,
+        whenSelfXLower: Direction
+    ) -> Direction:
+        if self.nextnode is None:
+            raise BrokenGameLogicException(
+                'Cannot get directionOfNextNode for node without next node'
+            )
 
-    match [self.position.x - self.nextnode.position.x, self.position.y - self.nextnode.position.y]:
-      case [0, 1]:
-        return whenSelfYBigger
-      case [0, -1]:
-        return whenSelfYSmaller
-      case [1, 0]:
-        return whenSelfXBigger
-      case [-1, 0]:
-        return whenSelfXLower
-      case _:
-        raise BrokenGameLogicException(f'Impossible situation when nextnode.position={self.nextnode.position} and self.position={self.position} are not left-right-top-bottom neighbours')
+        match [
+            self.position.x - self.nextnode.position.x,
+            self.position.y - self.nextnode.position.y
+        ]:
+            case [0, 1]:
+                return whenSelfYBigger
+            case [0, -1]:
+                return whenSelfYSmaller
+            case [1, 0]:
+                return whenSelfXBigger
+            case [-1, 0]:
+                return whenSelfXLower
+            case _:
+                raise BrokenGameLogicException(
+                    f'''Impossible situation when nextnode.position={
+                        self.nextnode.position
+                    } and self.position={
+                        self.position
+                    } are not left-right-top-bottom neighbours'''
+                )
