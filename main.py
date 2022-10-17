@@ -1,7 +1,9 @@
 import sys
+from time import sleep
 import pygame
 from gameEngine import GameEngine
-from customExceptions import GameOverException, WillingExitException
+from customExceptions import GameOverException, WillingExitException,\
+    NoPredefinedStepsLeftException
 
 # 2    *    *    *
 #
@@ -22,5 +24,10 @@ if __name__ == "__main__":
         GameOverException, WillingExitException, KeyboardInterrupt
     ) as error:
         print(error)
+        pygame.quit()
+        sys.exit()
+    except NoPredefinedStepsLeftException as error:
+        print(error)
+        sleep(10)
         pygame.quit()
         sys.exit()
