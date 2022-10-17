@@ -8,16 +8,16 @@ from direction import Direction
 
 @dataclass
 class SnakeNode(_PositionHolder):
-    nextnode: Optional[Self] = None
+    nextNode: Optional[Self] = None
 
-    def getShiftedNode(
+    def getNewNodeShiftedInto(
         self,
         direction: Direction,
-        nextnode: Optional[Self] = None
+        nextNode: Optional[Self] = None
     ) -> Self:
         return SnakeNode(
-            self.position.getNewPositionBy(direction),
-            nextnode,
+            self.position.getNewPositionShiftedInto(direction),
+            nextNode,
         )
 
     @property
@@ -45,14 +45,14 @@ class SnakeNode(_PositionHolder):
         whenSelfXBigger: Direction,
         whenSelfXLower: Direction
     ) -> Direction:
-        if self.nextnode is None:
+        if self.nextNode is None:
             raise BrokenGameLogicException(
                 'Cannot get directionOfNextNode for node without next node'
             )
 
         match [
-            self.position.x - self.nextnode.position.x,
-            self.position.y - self.nextnode.position.y
+            self.position.x - self.nextNode.position.x,
+            self.position.y - self.nextNode.position.y
         ]:
             case [0, 1]:
                 return whenSelfYBigger
@@ -64,8 +64,8 @@ class SnakeNode(_PositionHolder):
                 return whenSelfXLower
             case _:
                 raise BrokenGameLogicException(
-                    f'''Impossible situation when nextnode.position={
-                        self.nextnode.position
+                    f'''Impossible situation when nextNode.position={
+                        self.nextNode.position
                     } and self.position={
                         self.position
                     } are not left-right-top-bottom neighbours'''
