@@ -16,7 +16,7 @@ from customExceptions import GameOverException, WillingExitException
 if __name__ == "__main__":
   game = GameEngine()
   try:
-    game.startGameLoop()
+    game.runGameLoop()
     # pass
   except (GameOverException, WillingExitException, KeyboardInterrupt) as error:
     print(error)

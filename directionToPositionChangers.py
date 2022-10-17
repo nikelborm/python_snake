@@ -9,8 +9,8 @@ PositionChangerForY = PositionChanger
 PositionChangerPair = Tuple[PositionChangerForX, PositionChangerForY]
 
 directionToPositionChangers: dict[Direction, PositionChangerPair] = {
-  Direction.top:    (lambda x: x,     lambda y: y + 1),
-  Direction.bottom: (lambda x: x,     lambda y: y - 1),
-  Direction.right:  (lambda x: x + 1, lambda y: y    ),
-  Direction.left:   (lambda x: x - 1, lambda y: y    ),
+  Direction.TOP:    (lambda x: x,     lambda y: y + 1),
+  Direction.BOTTOM: (lambda x: x,     lambda y: y - 1),
+  Direction.RIGHT:  (lambda x: x + 1, lambda y: y    ),
+  Direction.LEFT:   (lambda x: x - 1, lambda y: y    ),
 }
