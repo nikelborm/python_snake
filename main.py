@@ -4,6 +4,7 @@ import pygame
 from gameEngine import GameEngine
 from customExceptions import GameOverException, WillingExitException,\
     NoPredefinedStepsLeftException
+from soundProcessing import SoundKind, fillSoundStore, getSoundBy
 
 # 2    *    *    *
 #
@@ -16,19 +17,26 @@ from customExceptions import GameOverException, WillingExitException,\
 
 
 if __name__ == "__main__":
-    game = GameEngine()
+    pygame.mixer.init()
+    fillSoundStore()
+    gameEngine = GameEngine()
+    # gameEngine.renderGameOverScreen('You died because you are an idiot')
+    # sleep(5)
     while True:
         try:
-            game.runGameLoop()
+            gameEngine.runGameLoop()
             # pass
-        except (
-            GameOverException, WillingExitException, KeyboardInterrupt
-        ) as error:
+        except (WillingExitException, KeyboardInterrupt) as error:
             print(error)
-            pygame.quit()
-            sys.exit()
+            break
+        except GameOverException as error:
+            print(error)
+            gameEngine.renderGameOverScreen(error.args[0])
+            getSoundBy(SoundKind.GAME_OVER).play()
+            sleep(5)
         except NoPredefinedStepsLeftException as error:
             print(error)
             sleep(10)
-            pygame.quit()
-            sys.exit()
+            break
+    pygame.quit()
+    sys.exit()

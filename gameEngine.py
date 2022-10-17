@@ -3,7 +3,7 @@ from candy import Candy
 from candyColor import CandyColor
 from customExceptions import BrokenGameLogicException, GameOverException
 from direction import HORIZONTAL_DIRECTIONS, VERTICAL_DIRECTIONS, Direction
-from gameCellKind import GameCellKind
+from gameCellKind import CANDY_SET, GameCellKind
 from getAssetForCell import getAssetForCell, getColorForCell
 from position import Position
 from pyGameWindowController import PyGameWindowController
@@ -12,14 +12,18 @@ from pygame import rect
 from candyMap import CandyMap
 from constant import CELL_RENDERER, GAME_GRID_Y_SIZE_IN_GAME_CELLS, \
     GAME_GRID_X_SIZE_IN_GAME_CELLS
+from soundProcessing import SoundKind, getSoundBy
 
 
 class GameEngine:
     def __init__(self):
         self.__windowController = PyGameWindowController()
-        self.__setInitialGameState()
+        self.__playerScore: int = 0
+        self.__snakeLength: int = 0
 
     def runGameLoop(self):
+        self.__windowController.clearWindow()
+        self.__setInitialGameState()
         while True:
             rectsToRerender = self.__makeGameIteration(
                 self.__getNextHeadDirection(
@@ -28,38 +32,62 @@ class GameEngine:
             )
 
             self.__windowController.updadeScreen(*rectsToRerender)
+            # pass
+
+    def renderGameOverScreen(self, deathReason: str):
+        self.__windowController.renderGameOverScreen(
+            deathReason,
+            self.__playerScore,
+            self.__snakeLength
+        )
 
     def __makeGameIteration(self, direction: Direction):
         if self.__snake.willSnakeBiteItselfAfterMove(direction):
-            raise GameOverException('Head tried to eat body of the snake')
+            raise GameOverException('Snake tried to bite itself')
 
         if self.__willSnakeStepOutOfGameField(direction):
-            raise GameOverException('Head tried to eat border of game field')
+            raise GameOverException('Snake tried to bite border of game field')
 
         candy: Candy = self.__candiesField.getCandyBy(
             self.__snake.headPosition.getNewPositionShiftedInto(direction)
         )  # type: ignore
         doesHeadFacesCandy = candy is not None
+        if doesHeadFacesCandy:
+            getSoundBy(SoundKind.CANDY_EATEN).play()
 
-        cellsPositions = self.__snake.makeStepAndGetPositionsChangedTheirLook(
-            direction,
-            doesHeadFacesCandy
-        )
-
-        # every snake iteration we rerender only about 4 cells
-        rectsToRerender: List[rect.Rect] = [
-            self.__renderCell(position) for position in cellsPositions
+        return [
+            *(
+                self.__renderCell(position)
+                for position in self.__snake.makeStepAndGetPositionsToRerender(
+                    direction,
+                    doesHeadFacesCandy
+                )
+            ),
+            *self.__makeGameIterationForCandies(
+                candy,
+                doesHeadFacesCandy
+            )
         ]
 
+    def __makeGameIterationForCandies(
+        self,
+        candy: Candy,
+        doesHeadFacesCandy: bool
+    ):
         if doesHeadFacesCandy:
             self.__playerScore += candy.size
+            self.__snakeLength += 1
             self.__candiesField.removeCandyBy(candy.position)
 
+        removedCandyPositions = self.__candiesField.reduceAllCandiesSizeByOne()
+        rectsToRerender = [
+            self.__renderCell(candy.position)
+            for candy in self.__candiesField.getAllCandies()
+        ]
         rectsToRerender.extend(
             self.__renderCell(position)
-            for position in self.__candiesField.reduceAllCandiesSizeByOne()
+            for position in removedCandyPositions
         )
-
         return rectsToRerender
 
     def __getNextHeadDirection(
@@ -91,20 +119,30 @@ class GameEngine:
             position,
             overridedCellKind
         )
+        rectToRerender: Optional[rect.Rect] = None
 
         if cellRenderer == 'color':
-            return self.__windowController.drawColor(
+            rectToRerender = self.__windowController.drawColor(
                 getColorForCell(cellKind),
                 position
             )
-
-        if cellRenderer == 'asset':
-            return self.__windowController.drawAsset(
+        elif cellRenderer == 'asset':
+            rectToRerender = self.__windowController.drawAsset(
                 getAssetForCell(cellKind),
                 position
             )
 
-        raise BrokenGameLogicException('Unknown CELL_RENDERER')
+        if cellKind in CANDY_SET:
+            candy: Candy = self.__candiesField.getCandyBy(
+                position)  # type: ignore
+            self.__windowController.drawWhiteTextOnCell(
+                f'{candy.size}',
+                position
+            )
+        if rectToRerender:
+            return rectToRerender
+        else:
+            raise BrokenGameLogicException('Unknown CELL_RENDERER')
 
     def __willSnakeStepOutOfGameField(self, direction: Direction):
         position = self.__snake.headPosition.getNewPositionShiftedInto(
@@ -112,9 +150,9 @@ class GameEngine:
         )
         return (
             position.x < 0
-            or position.y <= 0
+            or position.y < 0
             or position.x >= GAME_GRID_X_SIZE_IN_GAME_CELLS
-            or position.y > GAME_GRID_Y_SIZE_IN_GAME_CELLS
+            or position.y >= GAME_GRID_Y_SIZE_IN_GAME_CELLS
         )
 
     def __getCellKindBy(
@@ -132,10 +170,6 @@ class GameEngine:
     def __setInitialGameState(self):
         self.__snake = Snake()
         self.__candiesField = CandyMap()
-        self.__setInitialCandies()
-        self.__playerScore: int = 0
-
-    def __setInitialCandies(self):
         candies = [
             self.__candiesField.createNewCandy(
                 Position(3, 4),
@@ -153,7 +187,10 @@ class GameEngine:
                 15
             )
         ]
-        rectsToRerender = [
-            self.__renderCell(candy.position) for candy in candies
-        ]
-        self.__windowController.updadeScreen(*rectsToRerender)
+        self.__windowController.updadeScreen(
+            *(self.__renderCell(candy.position) for candy in candies),
+            *(self.__renderCell(position)
+                for position in self.__snake.allNodesPositions)
+        )
+        self.__playerScore: int = 0
+        self.__snakeLength: int = 3

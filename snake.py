@@ -26,6 +26,12 @@ class Snake:
         return Position(self.__headNode.position.x, self.__headNode.position.y)
 
     @property
+    def allNodesPositions(self):
+        return [
+            node.position for node in self.__cachedNodeMap.getAll()
+        ]
+
+    @property
     def headDirection(self):
         return self.__neckNode.selfToNextNodeDirection
 
@@ -33,7 +39,7 @@ class Snake:
     def tailDirection(self):
         return self.__tailNode.nextNodeToSelfDirection
 
-    def makeStepAndGetPositionsChangedTheirLook(
+    def makeStepAndGetPositionsToRerender(
         self,
         direction: Direction,
         shouldBodyGrow: bool
@@ -90,15 +96,13 @@ class Snake:
 
         if position == self.__neckNode.position:
             complexNeckDirection = self.__neckDirection
-            kind = GameCellKind[
+            return GameCellKind[
                 f'''SNAKE_{
                     complexNeckDirection.incomingFrom.name
                 }_TO_{
                     complexNeckDirection.outcomingTo.name
                 }_CORNER'''
             ]
-            print(kind)
-            return kind
 
         raise BrokenGameLogicException(
             f'''You tried to get the game cell kind by the position={
