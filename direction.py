@@ -2,10 +2,10 @@ from enum import Enum
 
 
 class Direction(Enum):
-  top = 1
-  bottom = 2
-  right = 3
-  left = 4
+  TOP = 1
+  BOTTOM = 2
+  RIGHT = 3
+  LEFT = 4
 
-HORIZONTAL_DIRECTIONS = {Direction.right, Direction.left}
-VERTICAL_DIRECTIONS = {Direction.bottom, Direction.top}
+HORIZONTAL_DIRECTIONS = {Direction.RIGHT, Direction.LEFT}
+VERTICAL_DIRECTIONS = {Direction.BOTTOM, Direction.TOP}

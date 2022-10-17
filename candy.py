@@ -1,9 +1,9 @@
 from dataclasses import dataclass
-from candyColour import CandyColour
+from candyColor import CandyColor
 from positionHolder import _PositionHolder
 
 
 @dataclass
 class Candy(_PositionHolder):
-  colour: CandyColour
+  color: CandyColor
   size: int

@@ -19,19 +19,19 @@ class SnakeNode(_PositionHolder):
   @property
   def selfToNextNodeDirection(self):
     return self.__calcDirection(
-      Direction.bottom,
-      Direction.top,
-      Direction.left,
-      Direction.right,
+      Direction.BOTTOM,
+      Direction.TOP,
+      Direction.LEFT,
+      Direction.RIGHT,
     )
 
   @property
   def nextNodeToSelfDirection(self):
     return self.__calcDirection(
-      Direction.top,
-      Direction.bottom,
-      Direction.right,
-      Direction.left,
+      Direction.TOP,
+      Direction.BOTTOM,
+      Direction.RIGHT,
+      Direction.LEFT,
     )
 
   def __calcDirection(self,
