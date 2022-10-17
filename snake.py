@@ -90,13 +90,15 @@ class Snake:
 
         if position == self.__neckNode.position:
             complexNeckDirection = self.__neckDirection
-            return GameCellKind[
+            kind = GameCellKind[
                 f'''SNAKE_{
                     complexNeckDirection.incomingFrom.name
                 }_TO_{
                     complexNeckDirection.outcomingTo.name
                 }_CORNER'''
             ]
+            print(kind)
+            return kind
 
         raise BrokenGameLogicException(
             f'''You tried to get the game cell kind by the position={
@@ -107,7 +109,7 @@ class Snake:
     @property
     def __neckDirection(self):
         return ComplexNeckDirection(
-            self.__nodeBeforeNeck.selfToNextNodeDirection,
+            self.__nodeBeforeNeck.nextNodeToSelfDirection,
             self.__neckNode.selfToNextNodeDirection
         )
 
