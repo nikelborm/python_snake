@@ -1,6 +1,6 @@
 import os
 from gameCellKind import GameCellKind
-from pygame import Color, surface, image, transform
+from pygame import Color, surface, image, transform, PixelArray
 from constant import CELL_SIZE_IN_PIXELS, SNAKE_BODY_COLOR, RED, YELLOW, \
     BLUE, GAME_FIELD_BACKGROUND_COLOR
 
@@ -22,7 +22,8 @@ def loadImage(fileName: str) -> surface.Surface:
             CELL_SIZE_IN_PIXELS
         )
     )
-    scaledImageAsset.set_colorkey((0, 0, 0))
+    image_pixel_array = PixelArray(scaledImageAsset)
+    image_pixel_array.replace((0, 0, 0), GAME_FIELD_BACKGROUND_COLOR)
     return scaledImageAsset
 
 
