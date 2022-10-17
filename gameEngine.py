@@ -1,43 +1,34 @@
-import sys
 from typing import Optional
 from candy import Candy
 from candyColor import CandyColor
-from customExceptions import GameOverException, WillingExitException,\
-    NoPredefinedStepsLeftException
+from customExceptions import BrokenGameLogicException, GameOverException
 from direction import HORIZONTAL_DIRECTIONS, VERTICAL_DIRECTIONS, Direction
 from gameCellKind import GameCellKind
-from getAssetForCell import getColorForCell
+from getAssetForCell import getAssetForCell, getColorForCell
 from position import Position
+from pyGameWindowController import PyGameWindowController
 from snake import Snake
 from candyMap import CandyMap
-import pygame
-from constant import CELL_SIZE_IN_PIXELS, GAME_GRID_X_SIZE_IN_GAME_CELLS, \
-    GAME_GRID_Y_SIZE_IN_GAME_CELLS, GAME_OVER_BACKGROUND_COLOR, \
-    DIFFICULTY, GAME_FIELD_BACKGROUND_COLOR, changeblePredefinedSteps,\
-    GAME_OVER_TEXT_COLOR, USE_PREDEFINED_STEPS, WINDOW_SIZE_X, WINDOW_SIZE_Y
+from constant import CELL_RENDERER, GAME_GRID_Y_SIZE_IN_GAME_CELLS, \
+    GAME_GRID_X_SIZE_IN_GAME_CELLS
 
 
 class GameEngine:
     def __init__(self):
-        self.__initPyGame()
+        self.__windowController = PyGameWindowController()
         self.__setInitialGameState()
 
     def runGameLoop(self):
         while True:
-            self.__makeGameIteration()
-
-            pygame.display.update()
-
-            self.__gameClock.tick(DIFFICULTY)
-
-    def __makeGameIteration(self):
-        self.__makeSnakeIteration(
-            self.__getNextHeadDirection(
-                self.__parsePyGameEvents()
+            self.__makeGameIteration(
+                self.__getNextHeadDirection(
+                    self.__windowController.parsePyGameEvents()
+                )
             )
-        )
 
-    def __makeSnakeIteration(self, direction: Direction):
+            self.__windowController.updadeScreen()
+
+    def __makeGameIteration(self, direction: Direction):
         if self.__snake.willSnakeBiteItselfAfterMove(direction):
             raise GameOverException('Head tried to eat body of the snake')
 
@@ -54,6 +45,7 @@ class GameEngine:
             doesHeadFacesCandy
         )
 
+        # every snake iteration we rerender only about 4 cells
         for position in cellsPositions:
             self.__renderCell(position)
 
@@ -62,53 +54,6 @@ class GameEngine:
             self.__candiesField.removeCandyBy(candy.position)
 
         self.__candiesField.reduceAllCandiesSizeByOne()
-
-    def __renderCell(
-        self,
-        position: Position,
-        overridedCellKind: Optional[GameCellKind] = None
-    ):
-        print(f'{position}_{self.__candiesField.getGameCellKindBy(position)}')
-        cellKind: GameCellKind = (
-            overridedCellKind
-            or self.__snake.getGameCellKindBy(position)
-            or self.__candiesField.getGameCellKindBy(position)
-            or GameCellKind.VOID
-        )
-
-        pygame.draw.rect(
-            self.__gameWindow,
-            getColorForCell(cellKind),
-            pygame.Rect(
-                position.x * CELL_SIZE_IN_PIXELS,
-                WINDOW_SIZE_Y - position.y * CELL_SIZE_IN_PIXELS,
-                CELL_SIZE_IN_PIXELS,
-                CELL_SIZE_IN_PIXELS
-            )
-        )
-
-    def __renderVoidCell(self, position: Position):
-        self.__renderCell(position, GameCellKind.VOID)
-
-    def __renderGameOverScreen(self):
-        my_font = pygame.font.SysFont('times new roman', 90)
-        game_over_surface = my_font.render(
-            'GAME OVER',
-            True,
-            GAME_OVER_TEXT_COLOR
-        )
-        game_over_rect = game_over_surface.get_rect()
-        game_over_rect.midtop = (
-            int(WINDOW_SIZE_X / 2),
-            int(WINDOW_SIZE_Y / 4)
-        )
-        self.__gameWindow.fill(GAME_OVER_BACKGROUND_COLOR)
-        self.__gameWindow.blit(game_over_surface, game_over_rect)
-        self.__renderScore(0, GAME_OVER_TEXT_COLOR, 'times', 20)
-        pygame.display.flip()
-        # time.sleep(3)
-        # pygame.quit()
-        # sys.exit()
 
     def __getNextHeadDirection(
         self,
@@ -129,22 +74,32 @@ class GameEngine:
 
         return directionFromKeyboard
 
-    def __renderScore(self, choice, color, font, size):
-        score_font = pygame.font.SysFont(font, size)
-        score_surface = score_font.render(
-            f'Score : {self.__playerScore}',
-            True,
-            color
+    def __renderCell(
+        self,
+        position: Position,
+        overridedCellKind: Optional[GameCellKind] = None,
+        cellRenderer: str = CELL_RENDERER
+    ):
+        cellKind: GameCellKind = (
+            overridedCellKind
+            or self.__snake.getGameCellKindBy(position)
+            or self.__candiesField.getGameCellKindBy(position)
+            or GameCellKind.VOID
         )
-        score_rect = score_surface.get_rect()
-        if choice == 1:
-            score_rect.midtop = (int(WINDOW_SIZE_X / 10), 15)
-        else:
-            score_rect.midtop = (
-                int(WINDOW_SIZE_X / 2),
-                int(WINDOW_SIZE_Y / 1.25)
+
+        if cellRenderer == 'asset':
+            return self.__windowController.drawAsset(
+                getAssetForCell(cellKind),
+                position
             )
-        self.__gameWindow.blit(score_surface, score_rect)
+
+        if cellRenderer == 'color':
+            return self.__windowController.drawColor(
+                getColorForCell(cellKind),
+                position
+            )
+
+        raise BrokenGameLogicException('Unknown CELL_RENDERER')
 
     def __willSnakeStepOutOfGameField(self, direction: Direction):
         position = self.__snake.headPosition.getNewPositionShiftedInto(
@@ -156,24 +111,6 @@ class GameEngine:
             or position.x >= GAME_GRID_X_SIZE_IN_GAME_CELLS
             or position.y > GAME_GRID_Y_SIZE_IN_GAME_CELLS
         )
-
-    def __parsePyGameEvents(self) -> Optional[Direction]:
-        direction: Optional[Direction] = None
-
-        if USE_PREDEFINED_STEPS:
-            if not changeblePredefinedSteps:
-                raise NoPredefinedStepsLeftException()
-            return changeblePredefinedSteps.pop(0)
-
-        for event in pygame.event.get():
-            match [event.key if event.type == pygame.KEYDOWN else event.type]:
-                case [pygame.QUIT]:
-                    raise WillingExitException()
-                case [pygame.K_LEFT]:  direction = Direction.LEFT
-                case [pygame.K_RIGHT]: direction = Direction.RIGHT
-                case [pygame.K_UP]:    direction = Direction.TOP
-                case [pygame.K_DOWN]:  direction = Direction.BOTTOM
-        return direction
 
     def __setInitialGameState(self):
         self.__snake = Snake()
@@ -197,20 +134,3 @@ class GameEngine:
         )
         self.__renderCell(candy.position)
         self.__playerScore: int = 0
-
-    def __initPyGame(self):
-        check_errors = pygame.init()
-        if check_errors[1] > 0:
-            print(
-                f'[!] Had {check_errors[1]} errors when game init, exiting...'
-            )
-            sys.exit(-1)
-        else:
-            print('[+] Game successfully initialised')
-
-        pygame.display.set_caption('Snake game made by nikelborm')
-        self.__gameWindow = pygame.display.set_mode(
-            (WINDOW_SIZE_X, WINDOW_SIZE_Y)
-        )
-        self.__gameClock = pygame.time.Clock()
-        self.__gameWindow.fill(GAME_FIELD_BACKGROUND_COLOR)
