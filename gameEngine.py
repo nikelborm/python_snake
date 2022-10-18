@@ -66,6 +66,9 @@ class GameEngine:
             ),
             *self.__makeGameIterationForCandies(
                 candy,
+            ),
+            self.__windowController.renderScoreIntoGameWindow(
+                self.__playerScore
             )
         ]
 
@@ -108,7 +111,7 @@ class GameEngine:
         return self.__candiesField.createNewCandy(
             position,
             random.choice(ALL_CANDY_COLORS),
-            int(snakeWayToReachPosition * 1.2)
+            int(snakeWayToReachPosition * 2)
             + random.randrange(10)
             + 1
         )
@@ -193,25 +196,9 @@ class GameEngine:
     def __setInitialGameState(self):
         self.__snake = Snake()
         self.__candiesField = CandyMap()
-        candies = [
-            self.__candiesField.createNewCandy(
-                Position(3, 4),
-                CandyColor.BLUE,
-                5
-            ),
-            self.__candiesField.createNewCandy(
-                Position(5, 7),
-                CandyColor.RED,
-                9
-            ),
-            self.__candiesField.createNewCandy(
-                Position(2, 9),
-                CandyColor.YELLOW,
-                15
-            )
-        ]
         self.__windowController.updadeScreen(
-            *(self.__renderCell(candy.position) for candy in candies),
+            *(self.__renderCell(self.__generateCandy().position)
+                for _ in range(5)),
             *(self.__renderCell(position)
                 for position in self.__snake.allNodesPositions)
         )
