@@ -9,7 +9,7 @@ from position import Position
 # Hard       ->    40
 # Harder     ->    60
 # Impossible ->    120
-DIFFICULTY = 1
+DIFFICULTY = 10
 
 # CELL_RENDERER = 'color'
 CELL_RENDERER = 'asset'

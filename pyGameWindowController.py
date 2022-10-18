@@ -50,7 +50,7 @@ class PyGameWindowController:
         snakeLength: int
     ):
         self.__gameWindow.fill(GAME_OVER_BACKGROUND_COLOR)
-        self.renderCenteredText(
+        self.__renderCenteredText(
             'GAME OVER',
             GAME_OVER_TEXT_COLOR,
             'times new roman',
@@ -60,7 +60,7 @@ class PyGameWindowController:
                 int(WINDOW_SIZE_Y / 4)
             )
         )
-        self.renderCenteredText(
+        self.__renderCenteredText(
             f'Score: {playerScore}',
             WHITE,
             'times new roman',
@@ -70,7 +70,7 @@ class PyGameWindowController:
                 int(WINDOW_SIZE_Y / 1.25)
             )
         )
-        self.renderCenteredText(
+        self.__renderCenteredText(
             f'Snake lengh: {snakeLength}',
             GREEN,
             'times new roman',
@@ -80,7 +80,7 @@ class PyGameWindowController:
                 int(WINDOW_SIZE_Y / 1.35)
             )
         )
-        self.renderCenteredText(
+        self.__renderCenteredText(
             deathReason,
             GAME_OVER_TEXT_COLOR,
             'verdana',
@@ -115,15 +115,15 @@ class PyGameWindowController:
         return direction
 
     def renderScoreIntoGameWindow(self, score: int):
-        self.renderCenteredText(
+        return self.__renderCenteredText(
             f'Score: {score}',
-            GAME_OVER_TEXT_COLOR,
+            WHITE,
             'times new roman',
             20,
             (int(WINDOW_SIZE_X / 10), 15)
         )
 
-    def renderCenteredText(
+    def __renderCenteredText(
         self,
         text:  str,
         color: color.Color,
@@ -132,10 +132,12 @@ class PyGameWindowController:
         midtop: Tuple[int, int]
     ):
         score_font = pygame.font.SysFont(font, fontSize)
-        score_surface = score_font.render(text, True, color)
+        score_surface = score_font.render(
+            text, True, color, GAME_FIELD_BACKGROUND_COLOR
+        )
         score_rect = score_surface.get_rect()
         score_rect.midtop = midtop
-        self.__gameWindow.blit(score_surface, score_rect)
+        return self.__gameWindow.blit(score_surface, score_rect)
 
     def __initPyGame(self):
         check_errors = pygame.init()
