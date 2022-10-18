@@ -1,5 +1,6 @@
 import pygame
 from direction import Direction
+from position import Position
 
 
 # Difficulty settings
@@ -71,3 +72,10 @@ PREDEFINED_STEPS = [
 changeablePredefinedSteps = [*PREDEFINED_STEPS]
 
 USE_PREDEFINED_STEPS = False
+
+
+ALL_POSSIBLE_POSITIONS = {
+  Position(x, y)
+  for x in range(GAME_GRID_X_SIZE_IN_GAME_CELLS)
+  for y in range(GAME_GRID_Y_SIZE_IN_GAME_CELLS)
+}

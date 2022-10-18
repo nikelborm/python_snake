@@ -1,6 +1,7 @@
-from typing import List, Optional
+import random
+from typing import Optional
 from candy import Candy
-from candyColor import CandyColor
+from candyColor import ALL_CANDY_COLORS, CandyColor
 from customExceptions import BrokenGameLogicException, GameOverException
 from direction import HORIZONTAL_DIRECTIONS, VERTICAL_DIRECTIONS, Direction
 from gameCellKind import CANDY_SET, GameCellKind
@@ -10,8 +11,8 @@ from pyGameWindowController import PyGameWindowController
 from snake import Snake
 from pygame import rect
 from candyMap import CandyMap
-from constant import CELL_RENDERER, GAME_GRID_Y_SIZE_IN_GAME_CELLS, \
-    GAME_GRID_X_SIZE_IN_GAME_CELLS
+from constant import ALL_POSSIBLE_POSITIONS, CELL_RENDERER, \
+    GAME_GRID_Y_SIZE_IN_GAME_CELLS, GAME_GRID_X_SIZE_IN_GAME_CELLS
 from soundProcessing import SoundKind, getSoundBy
 
 
@@ -80,15 +81,38 @@ class GameEngine:
             self.__candiesField.removeCandyBy(candy.position)
 
         removedCandyPositions = self.__candiesField.reduceAllCandiesSizeByOne()
-        rectsToRerender = [
-            self.__renderCell(candy.position)
-            for candy in self.__candiesField.getAllCandies()
+
+        if doesHeadFacesCandy:
+            removedCandyPositions.append(candy.position)
+
+        return [
+            *(self.__renderCell(candy.position)
+                for candy in self.__candiesField.getAllCandies()),
+
+            *(self.__renderCell(position)
+                for position in removedCandyPositions),
+
+            *(self.__renderCell(self.__generateCandy().position)
+                for _ in removedCandyPositions)
         ]
-        rectsToRerender.extend(
-            self.__renderCell(position)
-            for position in removedCandyPositions
+
+    def __generateCandy(self):
+        position = random.choice(tuple(
+            ALL_POSSIBLE_POSITIONS
+            - {candy.position for candy in self.__candiesField.getAllCandies()}
+            - set(self.__snake.allNodesPositions)
+        ))
+        snakeWayToReachPosition = (
+            abs(position.x - self.__snake.headPosition.x)
+            + abs(position.y - self.__snake.headPosition.y)
         )
-        return rectsToRerender
+        return self.__candiesField.createNewCandy(
+            position,
+            random.choice(ALL_CANDY_COLORS),
+            int(snakeWayToReachPosition * 1.2)
+            + random.randrange(10)
+            + 1
+        )
 
     def __getNextHeadDirection(
         self,

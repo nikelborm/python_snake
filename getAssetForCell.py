@@ -68,8 +68,8 @@ cellKindToImageMap: dict[GameCellKind, surface.Surface] = {
     GameCellKind.VOID: loadImage('emptiness'),
 
     GameCellKind.RED_CANDY: loadImage('apple'),
-    GameCellKind.BLUE_CANDY: loadImage('apple'),
-    GameCellKind.YELLOW_CANDY: loadImage('apple'),
+    GameCellKind.BLUE_CANDY: loadImage('blueCandy'),
+    GameCellKind.YELLOW_CANDY: loadImage('yellowCandy'),
 
     GameCellKind.HORIZONTAL_BODY: loadImage('horizontalBody'),
 
