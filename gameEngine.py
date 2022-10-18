@@ -49,9 +49,9 @@ class GameEngine:
         if self.__willSnakeStepOutOfGameField(direction):
             raise GameOverException('Snake tried to bite border of game field')
 
-        candy: Candy = self.__candiesField.getCandyBy(
+        candy = self.__candiesField.getCandyBy(
             self.__snake.headPosition.getNewPositionShiftedInto(direction)
-        )  # type: ignore
+        )
         doesHeadFacesCandy = candy is not None
         if doesHeadFacesCandy:
             getSoundBy(SoundKind.CANDY_EATEN).play()
@@ -66,15 +66,14 @@ class GameEngine:
             ),
             *self.__makeGameIterationForCandies(
                 candy,
-                doesHeadFacesCandy
             )
         ]
 
     def __makeGameIterationForCandies(
         self,
-        candy: Candy,
-        doesHeadFacesCandy: bool
+        candy: Optional[Candy],
     ):
+        doesHeadFacesCandy = candy is not None
         if doesHeadFacesCandy:
             self.__playerScore += candy.size
             self.__snakeLength += 1
