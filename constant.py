@@ -2,7 +2,10 @@ import pygame
 from direction import Direction
 from position import Position
 
-# Difficulty settings (Speed)
+# At the moment difficulty doesn't depend only on this number, because
+# speed will feel different on different grid sizes
+
+# Speed settings (FPS basically)
 # Easy       ->    10
 # Medium     ->    15
 # Hard       ->    20
@@ -10,10 +13,10 @@ from position import Position
 # Very hard  ->    30
 # Insane     ->    60 - use it only if you have 40 years old PC
 # Impossible ->    120
-DIFFICULTY = 15
+SPEED = 5 # 5 feels quite nice and playable at 16 * 16 grid
 
-CELL_RENDERER = 'color'
-# CELL_RENDERER = 'asset'
+# CELL_RENDERER = 'color'
+CELL_RENDERER = 'asset'
 
 GAME_GRID_X_SIZE_IN_GAME_CELLS = 16
 GAME_GRID_Y_SIZE_IN_GAME_CELLS = 16

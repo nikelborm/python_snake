@@ -6,7 +6,7 @@ from direction import Direction
 from position import Position
 import pygame
 from pygame import surface, color, rect
-from constant import CELL_SIZE_IN_PIXELS, DIFFICULTY, GREEN, WHITE, \
+from constant import CELL_SIZE_IN_PIXELS, SPEED, GREEN, WHITE, \
     WINDOW_SIZE_Y, \
     GAME_FIELD_BACKGROUND_COLOR, GAME_OVER_TEXT_COLOR, USE_PREDEFINED_STEPS, \
     WINDOW_SIZE_X, GAME_OVER_BACKGROUND_COLOR, changeablePredefinedSteps
@@ -18,7 +18,7 @@ class PyGameWindowController:
 
     def updadeScreen(self, *rectsToRerender: rect.Rect):
         pygame.display.update(list(rectsToRerender))
-        self.__gameClock.tick(DIFFICULTY)
+        self.__gameClock.tick(SPEED)
 
     def drawAsset(self, sourceAsset: surface.Surface, position: Position):
         assetRect = sourceAsset.get_rect(**self.__getCellRectFrom(position))
