@@ -6,6 +6,20 @@ For all the AMOLED enjoyers out there:
 |---|---|
 | ![Screenshot when the game is active](https://raw.githubusercontent.com/nikelborm/python_snake/refs/heads/main/readme_assets/Screenshot%20From%202024-11-16%2004-50-03.png) | ![Screenshot when the game is over](https://raw.githubusercontent.com/nikelborm/python_snake/refs/heads/main/readme_assets/Screenshot%20From%202024-11-16%2004-50-13.png) |
 
+## Prepare:
+
+```bash
+python -m venv .venv
+. .venv/bin/activate
+pip install -r ./requirements.txt
+```
+
+## Run:
+
+```bash
+. .venv/bin/activate
+python main.py
+```
 ## TODO
 
 1. fix white pixel trails left by text leftovers:
