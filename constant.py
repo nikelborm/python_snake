@@ -2,22 +2,23 @@ import pygame
 from direction import Direction
 from position import Position
 
-
-# Difficulty settings
+# Difficulty settings (Speed)
 # Easy       ->    10
-# Medium     ->    25
-# Hard       ->    40
-# Harder     ->    60
+# Medium     ->    15
+# Hard       ->    20
+# Quite hard ->    25
+# Very hard  ->    30
+# Insane     ->    60 - use it only if you have 40 years old PC
 # Impossible ->    120
-DIFFICULTY = 4
+DIFFICULTY = 15
 
-# CELL_RENDERER = 'color'
-CELL_RENDERER = 'asset'
+CELL_RENDERER = 'color'
+# CELL_RENDERER = 'asset'
 
 GAME_GRID_X_SIZE_IN_GAME_CELLS = 16
 GAME_GRID_Y_SIZE_IN_GAME_CELLS = 16
 
-CELL_SIZE_IN_PIXELS = 100
+CELL_SIZE_IN_PIXELS = 80
 
 WINDOW_SIZE_X = GAME_GRID_X_SIZE_IN_GAME_CELLS * CELL_SIZE_IN_PIXELS
 WINDOW_SIZE_Y = GAME_GRID_Y_SIZE_IN_GAME_CELLS * CELL_SIZE_IN_PIXELS

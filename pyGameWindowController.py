@@ -50,46 +50,15 @@ class PyGameWindowController:
         snakeLength: int
     ):
         self.__gameWindow.fill(GAME_OVER_BACKGROUND_COLOR)
-        self.__renderCenteredText(
-            'GAME OVER',
-            GAME_OVER_TEXT_COLOR,
-            'times new roman',
-            90,
-            (
-                int(WINDOW_SIZE_X / 2),
-                int(WINDOW_SIZE_Y / 4)
-            )
-        )
-        self.__renderCenteredText(
-            f'Score: {playerScore}',
-            WHITE,
-            'times new roman',
-            26,
-            (
-                int(WINDOW_SIZE_X / 2),
-                int(WINDOW_SIZE_Y / 1.25)
-            )
-        )
-        self.__renderCenteredText(
-            f'Snake lengh: {snakeLength}',
-            GREEN,
-            'times new roman',
-            26,
-            (
-                int(WINDOW_SIZE_X / 2),
-                int(WINDOW_SIZE_Y / 1.35)
-            )
-        )
-        self.__renderCenteredText(
-            deathReason,
-            GAME_OVER_TEXT_COLOR,
-            'verdana',
-            30,
-            (
-                int(WINDOW_SIZE_X / 2),
-                int(WINDOW_SIZE_Y / 1.65)
-            )
-        )
+
+        for text, color, font, fontSize, midtop in (
+            ('GAME OVER',                   GAME_OVER_TEXT_COLOR, 'times new roman', 90, (int(WINDOW_SIZE_X / 2), int(WINDOW_SIZE_Y / 4   ))),
+            (f'Score: {playerScore}',       WHITE,                'times new roman', 26, (int(WINDOW_SIZE_X / 2), int(WINDOW_SIZE_Y / 1.25))),
+            (f'Snake lengh: {snakeLength}', GREEN,                'times new roman', 26, (int(WINDOW_SIZE_X / 2), int(WINDOW_SIZE_Y / 1.35))),
+            (deathReason,                   GAME_OVER_TEXT_COLOR, 'verdana',         30, (int(WINDOW_SIZE_X / 2), int(WINDOW_SIZE_Y / 1.65)))
+        ):
+            self.__renderCenteredText(text, color, font, fontSize, midtop)
+
         pygame.display.update()
 
     def clearWindow(self):
@@ -104,6 +73,9 @@ class PyGameWindowController:
                 raise NoPredefinedStepsLeftException()
             return changeablePredefinedSteps.pop(0)
 
+        # parsing all last events at once, so if user changed their mind
+        # about snake's direction mid-frame and clicked 2 opposite arrows,
+        # only the last press will be interpreted
         for event in pygame.event.get():
             match [event.key if event.type == pygame.KEYDOWN else event.type]:
                 case [pygame.QUIT]:
@@ -112,6 +84,7 @@ class PyGameWindowController:
                 case [pygame.K_RIGHT]: direction = Direction.RIGHT
                 case [pygame.K_UP]:    direction = Direction.TOP
                 case [pygame.K_DOWN]:  direction = Direction.BOTTOM
+
         return direction
 
     def renderScoreIntoGameWindow(self, score: int):

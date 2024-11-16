@@ -1,6 +1,5 @@
 from dataclasses import dataclass
 from typing import Optional
-from typing_extensions import Self
 from customExceptions import BrokenGameLogicException
 from positionHolder import _PositionHolder
 from direction import Direction
@@ -8,13 +7,13 @@ from direction import Direction
 
 @dataclass
 class SnakeNode(_PositionHolder):
-    nextNode: Optional[Self] = None
+    nextNode: Optional['SnakeNode'] = None
 
     def getNewNodeShiftedInto(
         self,
         direction: Direction,
-        nextNode: Optional[Self] = None
-    ) -> Self:
+        nextNode: Optional['SnakeNode'] = None
+    ) -> 'SnakeNode':
         return SnakeNode(
             self.position.getNewPositionShiftedInto(direction),
             nextNode,
